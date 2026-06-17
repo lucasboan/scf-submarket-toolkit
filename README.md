@@ -44,9 +44,9 @@ This project was architected with an emphasis on readability through separation 
 ## Design choices
 Throughout the development of the toolkit, I made two key architectural decisions to prioritize readability and accuracy:
 
-    - Spatial Join vs Clipping: Early iterations considered using `geopandas.clip()` exactly at the county line. This approach was discarded because it fundamentally changes the true geometry of the ZCTA and creates artificial "slivers" of ZIP codes. Instead, sjoin(predicate='intersects') was chosen to retain the entire organic geometry of any given ZIP code touching a given county.
+1. Spatial Join vs Clipping: Early iterations considered using `geopandas.clip()` exactly at the county line. This approach was discarded because it fundamentally changes the true geometry of the ZCTA and creates artificial "slivers" of ZIP codes. Instead, sjoin(predicate='intersects') was chosen to retain the entire organic geometry of any given ZIP code touching a given county.
 
-    - Dynamic reprojection: The pipeline explicitly reprojects data into `EPSG:3081` (Texas State Mapping System, Lambert Conformal Conic) for physical accuracy during the spatial joining. However, right before generating the GeoJSON output file, the GDF is converted to `EPSG:4326` (World Geodetic System/WGS 84) to be instantly compatible with web-mapping frameworks like Leaflet, geojson.io and Mapbox.
+2. Dynamic reprojection: The pipeline explicitly reprojects data into `EPSG:3081` (Texas State Mapping System, Lambert Conformal Conic) for physical accuracy during the spatial joining. However, right before generating the GeoJSON output file, the GDF is converted to `EPSG:4326` (World Geodetic System/WGS 84) to be instantly compatible with web-mapping frameworks like Leaflet, geojson.io and Mapbox.
 
 
 This pipeline demonstrates the core extraction, intersection, dissolve and output pattern for building custom geographic layers from raw public data. The engine's structure is designed to be agnostic.
