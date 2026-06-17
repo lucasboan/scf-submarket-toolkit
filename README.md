@@ -4,7 +4,7 @@
 ![SCF 752 Submarket Map Output](dallas_tarrant_map.jpg)
 Rendering of the Dallas-Tarrant (Fort Worth) SCF map on geojson.io
 
-## Description:
+## Description
 The SCF Submarket Toolkit is a Python data-engineering pipeline designed to transform raw, localized U.S. Census Bureau ZIP Code Tabulation Areas (ZCTAs), which approximate USPS ZIP codes, into unified, macro-level geographic submarkets in Texas. It is specifically engineered to resolve the spatial ambiguities which occur when federal postal routes intersect with rigid county boundaries.
 
 In commercial logistics, submarkets are often defined by the first three digits of a ZIP code, known as the Sectional Center Facility (SCF) prefix. However, because ZIP codes are designed for mail delivery trucks rather than for municipal politics, they frequently bleed across county lines. This creates overlapping geometries and inaccurate data aggregation when attempting to analyze a single county or a specific Metropolitan Statistical Area (MSA).
@@ -42,13 +42,11 @@ This project was architected with an emphasis on readability through separation 
 
 
 ## Design choices
-Throughout the development of the toolkit, I made three key architectural decisions to prioritize readability and accuracy:
+Throughout the development of the toolkit, I made two key architectural decisions to prioritize readability and accuracy:
 
-    1. Goal-oriented functions: Aligned with Pythonic coding practices, each of the functions is made to follow strict separation of concerns in the pipeline. This way, future users and developers of this code are handed clear and testable functions which can be readily debugged.
+    - Spatial Join vs Clipping: Early iterations considered using `geopandas.clip()` exactly at the county line. This approach was discarded because it fundamentally changes the true geometry of the ZCTA and creates artificial "slivers" of ZIP codes. Instead, sjoin(predicate='intersects') was chosen to retain the entire organic geometry of any given ZIP code touching a given county.
 
-    2. Spatial Join vs Clipping: Early iterations considered using `geopandas.clip()` exactly at the county line. This approach was discarded because it fundamentally changes the true geometry of the ZCTA and creates artificial "slivers" of ZIP codes. Instead, sjoin(predicate='intersects') was chosen to retain the entire organic geometry of any given ZIP code touching a given county.
-
-    3. Dynamic reprojection: The pipeline explicitly reprojects data into `EPSG:3081` (Texas State Mapping System, Lambert Conformal Conic) for physical accuracy during the spatial joining. However, right before generating the GeoJSON output file, the GDF is converted to `EPSG:4326` (World Geodetic System/WGS 84) to be instantly compatible with web-mapping frameworks like Leaflet, geojson.io and Mapbox.
+    - Dynamic reprojection: The pipeline explicitly reprojects data into `EPSG:3081` (Texas State Mapping System, Lambert Conformal Conic) for physical accuracy during the spatial joining. However, right before generating the GeoJSON output file, the GDF is converted to `EPSG:4326` (World Geodetic System/WGS 84) to be instantly compatible with web-mapping frameworks like Leaflet, geojson.io and Mapbox.
 
 
 This pipeline demonstrates the core extraction, intersection, dissolve and output pattern for building custom geographic layers from raw public data. The engine's structure is designed to be agnostic.
